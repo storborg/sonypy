@@ -1,0 +1,25 @@
+# Base ignores:
+# Silly OS X trash files.
+.DS_Store
+
+# vim backup files.
+.*.swp
+
+# other editor backup files.
+*~
+
+# Compiled python modules.
+*.pyc
+
+# Setuptools distribution folder.
+/dist/
+
+# Egg metadata, regenerated from source files by setuptools.
+/*.egg-info
+
+# Tests coverage temp files.
+.coverage
+/cover
+
+# Rendered documentation.
+docs/_build/
