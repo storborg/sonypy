@@ -52,30 +52,28 @@ class Discoverer(object):
     def _ssdp_discover(self, timeout=1):
         socket.setdefaulttimeout(timeout)
 
-        for addr in self._interface_addresses():
-            sock = socket.socket(socket.AF_INET,
-                                 socket.SOCK_DGRAM,
-                                 socket.IPPROTO_UDP)
-            sock.setstockopt(socket.SOL_SOCKET,
-                             socket.SO_REUSEADDR,
-                             1)
-            sock.setsockopt(socket.IPPROTO_IP,
-                            socket.IP_MULTICAST_TTL,
-                            2)
-            sock.bind((addr, 0))
+        sock = socket.socket(socket.AF_INET,
+                             socket.SOCK_DGRAM,
+                             socket.IPPROTO_UDP)
+        sock.setsockopt(socket.SOL_SOCKET,
+                        socket.SO_REUSEADDR,
+                        1)
+        sock.setsockopt(socket.IPPROTO_IP,
+                        socket.IP_MULTICAST_TTL,
+                        2)
+        for _ in xrange(2):
+            msg = discovery_msg % (SSDP_ADDR, SSDP_PORT, SSDP_MX)
+            sock.sendto(msg, (SSDP_ADDR, SSDP_PORT))
 
-            for _ in xrange(2):
-                msg = discovery_msg % (SSDP_ADDR, SSDP_PORT, SSDP_MX)
-                sock.sendto(msg, (SSDP_ADDR, SSDP_PORT))
-
-            try:
-                data = sock.recv(1024)
-            except socket.timeout:
-                pass
-            else:
-                print "*****"
-                print data
-                yield self._parse_ssdp_response(data)
+        try:
+            data = sock.recv(1024)
+        except socket.timeout:
+            print "SOCKET TIMEOUT"
+            pass
+        else:
+            print "*****"
+            print data
+            yield self._parse_ssdp_response(data)
 
     def _parse_device_definition(self, doc):
         """
